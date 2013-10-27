@@ -29,10 +29,10 @@ result: books.insert [
 ]
 
 [ '<p>Have the books been inserted?</p><ul>'
-  '<li>' (result{?it.ok = 1: "Yes on connection #" (it.connectionId), *: "No"}) '</li>'
+  '<li>' (result @ {?it.ok = 1: "Yes on connection #" (it.connectionId), *: "No"}) '</li>'
   '</ul>' ].print
   
-q: 0, result{++q (it.ok)}
+q: 0, result @ {++q (it.ok)}
 
 '<p>Number of books that were successfully inserted: ' q '</p>'.print
 
@@ -47,11 +47,11 @@ years: 1990..2013
 ['<table>',
   '<tr>'
     '<th>Year:</th>'
-    years{'<th>' ("" it.replace ~"19|20" "'") '</th>'}
+    years @ {'<th>' ("" it.replace ~"19|20" "'") '</th>'}
   '</tr>'
   '<tr>'
     '<th>Books:</th>'
-    years{'<td>' (books.length {year: {$lte: it}}) '</td>'}
+    years @ {'<td>' (books.length {year: {$lte: it}}) '</td>'}
   '</tr>'
 '</table>'].print
 
@@ -63,4 +63,4 @@ _flush_()
 
 results: books.find {title: ~'[Aa]nd'}
 
-['<ul>', results{'<li>' (it.author) '</li>'}.join '', '</ul>'].print
+['<ul>', results @ {'<li>' (it.author) '</li>'}.join '', '</ul>'].print
