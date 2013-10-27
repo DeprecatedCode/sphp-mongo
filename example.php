@@ -1,4 +1,8 @@
-title: "Using MongoDB &bull;", @import "../../test/test.php"
+title: "Using the MongoDB Plugin", plugin: "mongo"
+
+# Import test runner
+
+loc: "../../test/", @import(loc "test.php")
 
 # Get a database connection
 
@@ -24,12 +28,13 @@ result: books.insert [
 
 ]
 
-['Have the books been inserted? ',
-  result{?it.ok = 1: "Yes on connection #" (it.connectionId), *: "No"}.join ' &bull; '].print
+[ '<p>Have the books been inserted?</p><ul>'
+  '<li>' (result{?it.ok = 1: "Yes on connection #" (it.connectionId), *: "No"}) '</li>'
+  '</ul>' ].print
   
 q: 0, result{++q (it.ok)}
 
-'<br/><br/>Number of books that were successfully inserted: ' q .print
+'<p>Number of books that were successfully inserted: ' q '</p>'.print
 
 _flush_()
 
