@@ -79,18 +79,57 @@ sys::$plugin->mongo = cmd('mongo', null, array(
             $proxy->find = cmd('mongo.find', null, array(
               'object' => function ($cmd, $object) use ($collection) {
                 certify($object);
-                return $collection->find(SPHP_Mongo::format($object));
+                $arr = arr($collection->find(SPHP_Mongo::format($object)));
+                
+                /**
+                 * Skip
+                 */
+                $arr->skip = cmd('mongo.find.skip', null, array(
+                  'integer' => function ($skipCmd, $integer) use ($arr) {
+                    $arr->{'#value'}->skip($integer);
+                    return $arr;
+                  }
+                ));
+
+                /**
+                 * Sort
+                 */
+                $arr->sort = cmd('mongo.find.sort', null, array(
+                  'object' => function ($sortCmd, $object) use ($arr) {
+                    certify($object);
+                    $sort = array();
+                    foreach($object as $key => $value) {
+                      if ($key[0] !== '#') {
+                        $sort[$key] = $value;
+                      }
+                    }
+                    $arr->{'#value'}->sort($sort);
+                    return $arr;
+                  }
+                ));
+                
+                /**
+                 * Limit
+                 */
+                $arr->limit = cmd('mongo.find.limit', null, array(
+                  'integer' => function ($limitCmd, $integer) use ($arr) {
+                    $arr->{'#value'}->limit($integer);
+                    return $arr;
+                  }
+                ));
+                
+                /**
+                 * Return Cursor Array
+                 */
+                return $arr;
               },
               'array' => function ($cmd, $array) use ($collection) {
                 certify($array);
-                $parent = null;
-                $arr = a($parent);
                 $results = array();
                 foreach($array->{'#value'} as $object) {
                   $results[] = apply($cmd, $object);
                 }
-                $arr->{'#value'} = $results;
-                return $arr;
+                return arr($results);
               }
             ));
             
@@ -130,7 +169,7 @@ class SPHP_Mongo {
        * Regex
        */
       if (isset($value->{'#type'}) && $value->{'#type'} === 'regex') {
-        return array('$regex' => $value->{'#value'});
+        return array('$regex' => $value->{'#value'}, '$options' => 'i');
       }
       
       $result = array();

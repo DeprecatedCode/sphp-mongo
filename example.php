@@ -28,9 +28,14 @@ result: books.insert [
 
 ]
 
-[ '<p>Have the books been inserted?</p><ul>'
-  '<li>' (result @ {?it.ok = 1: "Yes on connection #" (it.connectionId), *: "No"}) '</li>'
-  '</ul>' ].print
+'<p>Have the books been inserted?</p><ul>' .print
+
+result @ {
+  ? it.ok = 1: '<li>Yes on connection #' (it.connectionId) '</li>' .print
+            *: '<li>No</li>' .print
+}
+
+'</ul>' .print
   
 q: 0, result @ {++q (it.ok)}
 
